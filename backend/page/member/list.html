@@ -56,6 +56,7 @@
             <el-button type="text" size="small" class="delBut non" @click="statusHandle(scope.row)">
               {{ scope.row.status == '1' ? '禁用' : '启用' }}
             </el-button>
+            <!-- todo 删除用户 -->
           </template>
         </el-table-column>
       </el-table>
@@ -141,7 +142,7 @@
           }).then(() => {
             enableOrDisableEmployee({ 'id': this.id, 'status': !this.status ? 1 : 0 }).then(res => {
               console.log('enableOrDisableEmployee', res)
-              if (String(res.code) === 100) {
+              if (String(res.code) === '100') {
                 this.$message.success('账号状态更改成功！')
                 this.handleQuery()
               }

@@ -34,9 +34,9 @@ function editEmployee(params) {
 }
 
 // 修改页面反查详情接口
-function queryEmployeeByAccount(account) {
+function queryEmployeeById(id) {
   return $axios({
-    url: `/user/${account}`,
+    url: `/user/id/${id}`,
     method: 'get'
   })
 }

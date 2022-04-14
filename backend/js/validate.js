@@ -19,8 +19,19 @@ function isCellPhone(val) {
 function checkAccount(rule, value, callback) {
   if (value == "") {
     callback(new Error("请输入账号"))
-  } else if (value.length > 20 || value.length < 3) {
-    callback(new Error("账号长度应是3-20"))
+  } else if (value.length > 20 || value.length < 6) {
+    callback(new Error("账号长度应是6-20位"))
+  } else {
+    callback()
+  }
+}
+
+//校验密码
+function checkPassword(rule, value, callback) {
+  if (value == "") {
+    callback(new Error("请输入密码"))
+  } else if (value.length > 20 || value.length < 6) {
+    callback(new Error("密码长度应是6-20位"))
   } else {
     callback()
   }
@@ -28,8 +39,9 @@ function checkAccount(rule, value, callback) {
 
 //校验姓名
 function checkName(rule, value, callback) {
-  if (value == "") {
-    callback(new Error("请输入姓名"))
+  if (value == null || value == '') {
+    callback()
+    // callback(new Error("请输入姓名"))
   } else if (value.length > 12) {
     callback(new Error("账号长度应是1-12"))
   } else {
@@ -37,10 +49,11 @@ function checkName(rule, value, callback) {
   }
 }
 
-function checkPhone(rule, value, callback) {
+function checkTelephone(rule, value, callback) {
   // let phoneReg = /(^1[3|4|5|6|7|8|9]\d{9}$)|(^09\d{8}$)/;
-  if (value == "") {
-    callback(new Error("请输入手机号"))
+  if (value == null || value == '') {
+    // callback(new Error("请输入手机号"))
+    callback()
   } else if (!isCellPhone(value)) {//引入methods中封装的检查手机格式的方法
     callback(new Error("请输入正确的手机号!"))
   } else {

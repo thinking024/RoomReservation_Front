@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <!-- 引入样式 -->
+  <link rel="stylesheet" href="../../plugins/element-ui/index.css" />
+  <link rel="stylesheet" href="../../styles/common.css" />
+  <link rel="stylesheet" href="../../styles/page.css" />
+</head>
+
+<body>
+  <div class="dashboard-container" id="building-app">
+    <div class="container">
+      <!-- <div class="tableBar" style="display: inline-block">
+        <el-button type="primary" @click="addBuilding()">
+          + 新增楼宇
+        </el-button>
+      </div> -->
+
+      <div class="tableBar">
+        <el-input v-model="input" placeholder="请输入名称" style="width: 250px" clearable @keyup.enter.native="handleQuery">
+          <i slot="prefix" class="el-input__icon el-icon-search" style="cursor: pointer" @click="init"></i>
+        </el-input>
+        <div class="tableLab">
+          <span class="span-btn delBut non" @click="deleteHandle('批量', null)">删除</span>
+          <span class="span-btn blueBug non" @click="statusHandle('1')">启用</span>
+          <span style="border:none;" class="span-btn delBut non" @click="statusHandle('0')">停用</span>
+          <el-button type="primary" @click="addBuilding()">
+            + 新增楼宇
+          </el-button>
+        </div>
+      </div>
+
+      <!-- 表格数据 -->
+      <!-- todo 名称宽度缩短，备注宽度增加 -->
+      <el-table :data="tableData" stripe class="tableBox" @selection-change="handleSelectionChange">
+        <el-table-column type="selection" width="25"></el-table-column>
+        <el-table-column prop="name" label="名称" />
+        </el-table-column>
+
+        <el-table-column prop="image" label="图片" align="center">
+          <template slot-scope="{ row }">
+            <el-image style="width: auto; height: 40px; border:none;cursor: pointer;" :src="getImage(row.image)"
+              :preview-src-list="[ `/common/download?name=${row.image}` ]">
+              <div slot="error" class="image-slot">
+                <!-- <span style="width: auto; height: 40px;">暂无图片</span> -->
+                <img src="./../../images/noImg.png" style="width: auto; height: 40px; border:none;">
+              </div>
+            </el-image>
+          </template>
+        </el-table-column>
+
+        <el-table-column prop="status" label="状态">
+          <template slot-scope="scope">
+            <span>{{ scope.row.status == '0' ? '已禁用' : '正常' }}</span>
+          </template>
+        </el-table-column>
+
+        <el-table-column prop="info" label="备注信息">
+          <template slot-scope="scope">
+            {{scope.row.info}}
+          </template>
+        </el-table-column>
+
+        <el-table-column label="操作" width="160" align="center">
+          <template slot-scope="scope">
+            <el-button type="text" size="small" class="blueBug" @click="editHandle(scope.row)">
+              修改
+            </el-button>
+            <!-- todo 添加单个修改状态的按钮 -->
+            <el-button type="text" size="small" class="blueBug" @click="statusHandle(scope.row)">
+              {{ scope.row.status == '0' ? '启用' : '停用' }}
+            <el-button type="text" size="small" class="delBut non" @click="deleteHandle('单删', scope.row.id)">
+              删除
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+
+      <!-- 分页控件 -->
+      <el-pagination class="pageList" :page-sizes="[10, 20, 30, 40]" :page-size="pageSize"
+        layout="total, sizes, prev, pager, next, jumper" :total="counts" @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"></el-pagination>
+    </div>
+
+    <!-- 新增楼宇弹出式对话框 -->
+    <el-dialog :title="dialogData.title" :visible.sync="dialogData.dialogVisible" width="30%"
+      :before-close="handleClose">
+      <el-form class="demo-form-inline" label-width="100px">
+        <el-form-item label="楼宇名称：">
+          <el-input v-model="dialogData.name" placeholder="请输入分类名称" maxlength="14" />
+        </el-form-item>
+        <el-form-item label="备注信息：">
+          <el-input v-model="dialogData.info" placeholder="请输入备注信息" maxlength="14" />
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button size="medium" @click="dialogData.dialogVisible = false">取 消</el-button>
+        <el-button type="primary" size="medium" @click="submitForm()">确 定</el-button>
+        <el-button v-if="action != 'edit'" type="primary" size="medium" class="continue" @click="submitForm('go')">
+          保存并继续添加 </el-button>
+      </span>
+    </el-dialog>
+  </div>
+  <!-- 开发环境版本，包含了有帮助的命令行警告 -->
+  <script src="../../plugins/vue/vue.js"></script>
+  <!-- 引入组件库 -->
+  <script src="../../plugins/element-ui/index.js"></script>
+  <!-- 引入axios -->
+  <script src="../../plugins/axios/axios.min.js"></script>
+  <script src="../../js/request.js"></script>
+  <script src="../../api/building.js"></script>
+  <script>
+    var buildingApp = new Vue({
+      el: '#building-app',
+      data() {
+        return {
+          input: '',
+          action: '',
+          counts: 0,
+          page: 1,
+          pageSize: 10,
+          tableData: [],
+          // 弹出框数据
+          dialogData: {
+            title: '添加楼宇',
+            dialogVisible: false,
+            id: '',
+            name: '',
+            info: '',
+            image: ''
+          },
+          checkList: []
+        }
+      },
+      computed: {},
+      created() {
+        this.init()
+      },
+      mounted() {
+      },
+      methods: {
+        async init() {
+          const params = {
+            page: this.page,
+            pageSize: this.pageSize,
+            name: this.input ? this.input : undefined
+          }
+          await getBuildingPage(params).then(res => {
+            if (String(res.code) === '100') {
+              this.tableData = res.data.records
+              this.counts = Number(res.data.total)
+            } else {
+              this.$message.error(res.msg || '操作失败')
+            }
+          }).catch(err => {
+            this.$message.error('请求出错了：' + err)
+          })
+        },
+        handleQuery() {
+          this.page = 1;
+          this.init();
+        },
+        getImage(image) {
+          return `/common/download?name=${image}`
+        },
+        // 添加
+        addBuilding() {
+          this.action = 'add'
+          this.dialogData.name = ''
+          this.dialogData.info = ''
+          this.dialogData.dialogVisible = true
+        },
+        editHandle(dat) {
+          this.dialogData.title = '修改楼宇'
+          this.action = 'edit'
+          this.dialogData.name = dat.name
+          this.dialogData.id = dat.id
+          this.dialogData.info = dat.info
+          this.dialogData.dialogVisible = true
+        },
+        // 关闭弹窗
+        handleClose(st) {
+          this.dialogData.dialogVisible = false
+        },
+        
+        // 删除
+        deleteHandle(type, id) {
+          if (type === '批量' && id === null) {
+            if (this.checkList.length === 0) {
+              return this.$message.error('请选择删除对象')
+            }
+          }
+          this.$confirm('确认删除, 是否继续?', '确定删除', {
+            'confirmButtonText': '确定',
+            'cancelButtonText': '取消',
+          }).then(() => {
+            deleteBuilding(type === '批量' ? this.checkList.join(',') : id).then(res => {
+              if (res.code == 100) {
+                this.$message.success('删除成功！')
+                this.handleQuery()
+              } else {
+                this.$message.error(res.msg || '操作失败')
+              }
+            }).catch(err => {
+              this.$message.error('请求出错了：' + err)
+            })
+          })
+        },
+
+        //状态更改
+        statusHandle(row) {
+          let params = {}
+          if (typeof row === 'string') {
+            if (this.checkList.length === 0) {
+              this.$message.error('请先勾选楼宇！')
+              return false
+            }
+            params.id = this.checkList.join(',')
+            params.status = row
+          } else {
+            params.id = row.id
+            params.status = row.status ? '0' : '1'
+          }
+          // this.dishState = params
+          this.$confirm('确认更改状态?', '提示', {
+            'confirmButtonText': '确定',
+            'cancelButtonText': '取消',
+            'type': 'warning'
+          }).then(() => {
+            changeStatus(params).then(res => {
+              if (res.code == 100) {
+                this.$message.success('状态已经更改成功！')
+                this.handleQuery()
+              } else {
+                this.$message.error(res.msg || '操作失败')
+              }
+            }).catch(err => {
+              this.$message.error('请求出错了：' + err)
+            })
+          })
+        },
+
+        //数据提交
+        submitForm(st) {
+          const dialogData = this.dialogData
+          const valid = (dialogData.name === 0 || dialogData.name)
+          if (this.action === 'add') {
+            if (valid) {
+              if (dialogData.info == '' || dialogData.info == undefined) {
+                dialogData.info = null
+              }
+              addBuilding({ 'name': dialogData.name, 'info': dialogData.info }).then(res => {
+                console.log(res)
+                if (res.code == 100) {
+                  this.$message.success('添加成功！')
+                  if (!st) {
+                    this.dialogData.dialogVisible = false
+                  } else {
+                    this.dialogData.name = ''
+                    this.dialogData.info = ''
+                  }
+                  this.handleQuery()
+                } else {
+                  this.$message.error(res.msg || '操作失败')
+                }
+              }).catch(err => {
+                this.$message.error('请求出错了：' + err)
+              })
+
+            } else {
+              this.$message.error('请输入楼宇名称')
+            }
+          } else if (valid) {
+            editBuilding({ 'id': this.dialogData.id, 'name': this.dialogData.name, 'info': this.dialogData.info }).then(res => {
+              if (res.code == 100) {
+                this.$message.success('修改成功！')
+                this.dialogData.dialogVisible = false
+                this.handleQuery()
+              } else {
+                this.$message.error(res.msg || '操作失败')
+              }
+            }).catch(err => {
+              this.$message.error('请求出错了：' + err)
+            })
+          } else {
+            this.$message.error('请输入楼宇名称')
+          }
+        },
+        // 全部操作
+        handleSelectionChange(val) {
+          let checkArr = []
+          val.forEach((n) => {
+            checkArr.push(n.id)
+          })
+          this.checkList = checkArr
+        },
+        handleSizeChange(val) {
+          this.pageSize = val
+          this.init()
+        },
+        handleCurrentChange(val) {
+          this.page = val
+          this.init()
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>
