@@ -71,10 +71,10 @@
             <el-button type="text" size="small" class="blueBug" @click="editHandle(scope.row)">
               修改
             </el-button>
-            <!-- todo 添加单个修改状态的按钮 -->
             <el-button type="text" size="small" class="blueBug" @click="statusHandle(scope.row)">
               {{ scope.row.status == '0' ? '启用' : '停用' }}
-            <el-button type="text" size="small" class="delBut non" @click="deleteHandle('单删', scope.row.id)">
+            </el-button>
+              <el-button type="text" size="small" class="delBut non" @click="deleteHandle('单删', scope.row.id)">
               删除
             </el-button>
           </template>
@@ -92,7 +92,7 @@
       :before-close="handleClose">
       <el-form class="demo-form-inline" label-width="100px">
         <el-form-item label="楼宇名称：">
-          <el-input v-model="dialogData.name" placeholder="请输入分类名称" maxlength="14" />
+          <el-input v-model="dialogData.name" placeholder="请输入名称" maxlength="14" />
         </el-form-item>
         <el-form-item label="备注信息：">
           <el-input v-model="dialogData.info" placeholder="请输入备注信息" maxlength="14" />
@@ -227,7 +227,7 @@
             params.status = row.status ? '0' : '1'
           }
           // this.dishState = params
-          this.$confirm('确认更改状态?', '提示', {
+          this.$confirm('此操作会将下属房间的状态也一起更改，确认更改状态?', '提示', {
             'confirmButtonText': '确定',
             'cancelButtonText': '取消',
             'type': 'warning'

@@ -1,60 +1,60 @@
 // 查询列表接口
-const getDishPage = (params) => {
+const getRoomPage = (params) => {
   return $axios({
-    url: '/dish/page',
+    url: '/room/page',
     method: 'get',
     params
   })
 }
 
 // 删除接口
-const deleteDish = (ids) => {
+const deleteRoom = (ids) => {
   return $axios({
-    url: '/dish',
+    url: '/room',
     method: 'delete',
     params: { ids }
   })
 }
 
 // 修改接口
-const editDish = (params) => {
+const editRoom = (params) => {
   return $axios({
-    url: '/dish',
+    url: '/room',
     method: 'put',
     data: { ...params }
   })
 }
 
 // 新增接口
-const addDish = (params) => {
+const addRoom = (params) => {
   return $axios({
-    url: '/dish',
+    url: '/room',
     method: 'post',
     data: { ...params }
   })
 }
 
 // 查询详情
-const queryDishById = (id) => {
+const queryRoomById = (id) => {
   return $axios({
-    url: `/dish/${id}`,
+    url: `/room/${id}`,
     method: 'get'
   })
 }
 
-// 获取菜品分类列表
-const getCategoryList = (params) => {
+// 获取楼宇列表
+const querytBuildingList = (params) => {
   return $axios({
-    url: '/category/list',
+    url: '/building/list',
     method: 'get',
     params
   })
 }
 
-// 查菜品列表的接口
-const queryDishList = (params) => {
+// 获取房间列表
+const queryRoomList = (params) => {
   return $axios({
-    url: '/dish/list',
+    url: '/room/list',
     method: 'get',
     params
   })
@@ -73,9 +73,9 @@ const commonDownload = (params) => {
 }
 
 // 起售停售---批量起售停售接口
-const dishStatusByStatus = (params) => {
+const roomStatusByStatus = (params) => {
   return $axios({
-    url: `/dish/status/${params.status}`,
+    url: `/room/status/${params.status}`,
     method: 'post',
     params: { ids: params.id }
   })
