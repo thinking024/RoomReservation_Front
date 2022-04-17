@@ -1,25 +1,25 @@
 // 查询列表页接口
-const getOrderDetailPage = (params) => {
+const getReservationDetailPage = (params) => {
   return $axios({
-    url: '/order/page',
+    url: '/reservation/page',
     method: 'get',
     params
   })
 }
 
 // 查看接口
-const queryOrderDetailById = (id) => {
+const queryReservationDetailById = (id) => {
   return $axios({
-    url: `/orderDetail/${id}`,
+    url: `/reservation/${id}`,
     method: 'get'
   })
 }
 
 // 取消，派送，完成接口
-const editOrderDetail = (params) => {
+const cancel = (params) => {
   return $axios({
-    url: '/order',
-    method: 'put',
+    url: '/reservation/cancel',
+    method: 'post',
     data: { ...params }
   })
 }
