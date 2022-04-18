@@ -33,11 +33,12 @@ function reservationAgainApi(data) {
   })
 }
 
-//再来一单
+// 取消预订
 function cancelReservationApi(data) {
+  console.log('data=' + data)
   return $axios({
     'url': '/reservation/cancel',
-    'method': 'get',
-    data
+    'method': 'post',
+    params: { ids: data }
   })
 }

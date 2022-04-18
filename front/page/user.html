@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="../styles/vant.min.css" />
     <!--本页面内容的样式-->
     <link rel="stylesheet" href="./../styles/user.css" />
+    <link rel="stylesheet" href="./../styles/order.css" />
     <!-- mintUI样式 -->
     <!-- <link rel="stylesheet" href="https://unpkg.com/mint-ui/lib/style.css"> -->
 </head>
@@ -30,7 +31,7 @@
             <div class="divUser">
                 <img src="./../images/headPage.png" />
                 <div class="desc">
-                    <div class="divName">{{user.name}} <img src="./../images/women.png" /></div>
+                    <div class="divName">{{user.name}} <img src="./../images/user.png" /></div>
                     <div class="divPhone">{{user.account}}</div>
                 </div>
             </div>
@@ -39,7 +40,7 @@
             <!-- 管理菜单 -->
             <div class="divLinks">
                 <div class="item" @click="toAddressPage">
-                    <img src="./../images/locations.png" />
+                    <img src="./../images/edit.png" />
                     <span>账号设置</span>
                     <i class="el-icon-arrow-right"></i>
                 </div>
@@ -51,7 +52,7 @@
                 </div>
             </div>
 
-            <div class="divOrders" v-if="reservations[0]">
+            <!-- <div class="divOrders" v-if="reservations.length > 0">
                 <div class="title">最近预订</div>
                 <div class="timeStatus">
                     <span>日期: </span>
@@ -73,6 +74,37 @@
                 <div class="btn" v-if="reservations[0].status === 1">
                     <el-button type="danger" @click="cancelReservation()" size="small">取消</el-button>
                 </div>
+            </div> -->
+            <div class="divOrders" v-if="reservations.length > 0">
+                <!-- <van-list v-model="loading" :finished="finished" finished-text="暂无更多近期预定记录" @load="init"> -->
+                <!-- todo 无数据时显示暂无的字样 -->
+                <van-cell-group inset>
+                    <div class="title">&nbsp;&nbsp;&nbsp;近期预定记录</div>
+                    <van-cell v-for="(reservation,index) in reservations" :key="index" class="item">
+                        <div class="timeStatus">
+                            <span>预订编号：</span>
+                            <span>{{reservation.id}}</span>
+                        </div>
+                        <div class="timeStatus">
+                            <span>日期: </span>
+                            <span>{{reservation.date}}</span>
+                        </div>
+                        <div class="timeStatus">
+                            <span>起止时间: </span>
+                            <span>{{reservation.beginTime}} ~ {{reservation.endTime}}</span>
+                        </div>
+                        <div class="timeStatus">
+                            <span>房间地址: </span>
+                            <span>{{reservation.buildingName}} {{reservation.roomName}}</span>
+                        </div>
+
+                        <div class="btn" v-if="reservation.status == 1">
+                            <!-- <el-button type="danger" @click="cancelReservation()" size="small">取消</el-button> -->
+                            <van-button type="danger" @click="cancelReservation(reservation.id)" size="small">取消预订</van-button>
+                        </div>
+                    </van-cell>
+                </van-cell-group>
+                <!-- </van-list> -->
             </div>
 
             <div class="quitLogin" @click="toPageLogin">
@@ -102,10 +134,6 @@
             el: "#user",
             data() {
                 return {
-                    form: {
-                        phone: '',
-                        code: ''
-                    },
                     user: {
                         id: "",
                         account: '',
@@ -113,7 +141,8 @@
                         name: '',
                         telephone: ''
                     },
-                    msgFlag: false,
+                    loading: false,
+                    finished: false,
                     reservations: [{
                         id: 1,
                         date: "2019-10-10",
@@ -122,23 +151,13 @@
                         status: 1,
                         buildingName: "逸夫楼",
                         roomName: "601",
-                    }],
-                    order: [{
-                        orderTime: '2020-02-01',//下单时间
-                        status: 1,//订单状态 1已结账，2未结账，3已退单，4已完成，5已取消
-                        orderDetails: [{
-                            name: '彩屏',//菜品名称
-                            number: 1,//数量
-                        }],//明细
-                        amount: 100,//实收金额
-                        sumNum: 0,//菜品总数
-                    }],
+                    }]
                 }
             },
             computed: {},
             created() {
                 // this.userPhone = sessionStorage.getItem("userPhone")
-                // this.init()
+                this.init()
             },
             mounted() { },
             methods: {
@@ -147,7 +166,7 @@
                 },
                 toAddressPage() {
                     window.requestAnimationFrame(() => {
-                        window.location.href = '/front/page/address.html'
+                        window.location.href = '/front/page/edit.html'
                     })
                 },
                 toReservationPage() {
@@ -156,7 +175,7 @@
                     })
                 },
                 async init() {
-                    Promise.all([getSelfInfoApi(), getSelfReservationApi()]).then(res => {
+                    Promise.all([getSelfInfoApi(), getRecentReservationApi()]).then(res => {
                         if (res[0].code == 100) {
                             this.user = res[0].data
                         } else {
@@ -165,6 +184,8 @@
 
                         if (res[1].code == 100) {
                             this.reservations = res[1].data || []
+                            this.loading = false
+                            this.finished = true
                         } else {
                             this.$notify({ type: 'warning', message: res[1].msg });
                         }
@@ -179,7 +200,7 @@
                     }
                     const res = await reservationPagingApi(params)
                     if (res.code == 100) {
-                        this.reservations = res.data.records || []
+                        // this.reservations = res.data.records || []
                         /* if (this.order && this.order[0].orderDetails) {
                             let number = 0
                             this.order[0].orderDetails.forEach(item => {
@@ -210,31 +231,30 @@
                     }
                     return str
                 },
-                async cancelReservation() {
-                    cancelReservationApi({ id: this.reservations[0].id }).then(res => {
+                cancelReservation(id) {
+                    this.$dialog.confirm({
+                        title: '确认取消预订',
+                        message: '确认要取消当前预定吗？',
+                    }).then(async () => {
+                        const res = await cancelReservationApi(id)
+                        if (res.code == 100) {
+                            this.$notify({ type: 'success', message: '取消预订成功' });
+                            this.init()
+                        } else {
+                            this.$notify({ type: 'warning', message: res.msg });
+                        }
+                    }).catch((err) => {
+                        this.$notify({ type: 'warning', message: err });
+                    });
+                    /* cancelReservationApi(id).then(res => {
                         if (res.code == 100) {
                             this.$notify({ type: 'success', message: '取消成功' });
+                            this.init()
                         } else {
                             this.$notify({ type: 'warning', message: res.msg });
                         }
                     }).catch(err => {
                         this.$notify({ type: 'warning', message: err });
-                    })
-                    /* this.$confirm('确认取消预订, 是否继续?', '确定取消', {
-                        'confirmButtonText': '确定',
-                        'cancelButtonText': '算了',
-                    }).then(() => {
-                        cancelReservationApi({ id: this.reservations[0].id }).then(res => {
-                            if (res.code == 100) {
-                                this.$notify({ type: 'success', message: '取消成功' });
-                            } else {
-                                this.$notify({ type: 'warning', message: res.msg });
-                            }
-                        }).catch(err => {
-                                this.$notify({ type: 'warning', message: err });
-                        })
-                        // 重新加载数据
-                        // this.init()
                     }) */
                 },
                 async toPageLogin() {

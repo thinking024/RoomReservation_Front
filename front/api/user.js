@@ -5,9 +5,17 @@ function getSelfInfoApi() {
     })
 }
 
-function getSelfReservationApi() {
+function getRecentReservationApi() {
     return $axios({
-        url: `/reservation/me`,
+        url: `/reservation/latest`,
         method: 'get'
+    })
+}
+
+function updateUserApi(data) {
+    return $axios({
+        url: `/user`,
+        method: 'put',
+        data
     })
 }

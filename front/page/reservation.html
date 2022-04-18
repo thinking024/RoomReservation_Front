@@ -48,8 +48,9 @@
                         <span>{{reservation.buildingName}} {{reservation.roomName}}</span>
                     </div>
 
-                    <div class="btn" v-if="reservation.status == 100">
-                        <el-button type="danger" @click="cancelReservation()" size="small">取消</el-button>
+                    <div class="btn" v-if="reservation.status == 1">
+                        <!-- <el-button type="danger" @click="cancelReservation()" size="small">取消</el-button> -->
+                        <van-button type="danger" @click="cancelReservation(reservation.id)" size="small">取消预订</van-button>
                     </div>
                 </van-cell>
             </van-list>
@@ -134,15 +135,66 @@
                         this.$notify({ type: 'warning', message: res.msg });
                     }
                 },
-                async addOrderAgain(order) {
-                    const res = await orderAgainApi({ id: order.id })
-                    if (res.code == 100) {
-                        window.requestAnimationFrame(() => {
-                            window.location.href = '/front/index.html'
-                        })
-                    } else {
-                        this.$notify({ type: 'warning', message: res.msg });
+                getStatus(status) {
+                    let str = ''
+                    switch (status) {
+                        case 0:
+                            str = '已取消'
+                            break;
+                        case 1:
+                            str = '未开始'
+                            break;
+                        case 2:
+                            str = '已结束'
+                            break;
+                        case 3:
+                            str = '已失效'
+                            break;
+
                     }
+                    return str
+                },
+                async cancelReservation(id) {
+                    cancelReservationApi(id).then(res => {
+                        if (res.code == 100) {
+                            this.$notify({ type: 'success', message: '取消成功' });
+                            // 重置查询数据
+                            /* this.finished = false
+                            this.reservations = []
+                            this.paging = {
+                                page: 1,
+                                pageSize: 5
+                            }
+                            this.initData() */
+                            // 遍历reservations数组，将其中的id与传过来的id相同的项修改
+                            this.reservations.forEach(item => {
+                                if (item.id == id) {
+                                    item.status = 0
+                                }
+                            })
+                        } else {
+                            this.$notify({ type: 'warning', message: res.msg });
+                        }
+                    }).catch(err => {
+                        this.$notify({ type: 'warning', message: err });
+                    })
+                    // todo 提示框确认
+                    /* this.$confirm('确认取消预订, 是否继续?', '确定取消', {
+                        'confirmButtonText': '确定',
+                        'cancelButtonText': '算了',
+                    }).then(() => {
+                        cancelReservationApi({ id: this.reservations[0].id }).then(res => {
+                            if (res.code == 100) {
+                                this.$notify({ type: 'success', message: '取消成功' });
+                            } else {
+                                this.$notify({ type: 'warning', message: res.msg });
+                            }
+                        }).catch(err => {
+                                this.$notify({ type: 'warning', message: err });
+                        })
+                        // 重新加载数据
+                        // this.init()
+                    }) */
                 },
                 getStatus(status) {
                     let str = ''
