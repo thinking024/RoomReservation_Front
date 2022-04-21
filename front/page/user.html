@@ -78,6 +78,7 @@
             <div class="divOrders" v-if="reservations.length > 0">
                 <!-- <van-list v-model="loading" :finished="finished" finished-text="暂无更多近期预定记录" @load="init"> -->
                 <!-- todo 无数据时显示暂无的字样 -->
+                <!-- <van-empty image="search" description="描述文字" /> -->
                 <van-cell-group inset>
                     <div class="title">&nbsp;&nbsp;&nbsp;近期预定记录</div>
                     <van-cell v-for="(reservation,index) in reservations" :key="index" class="item">
@@ -100,7 +101,8 @@
 
                         <div class="btn" v-if="reservation.status == 1">
                             <!-- <el-button type="danger" @click="cancelReservation()" size="small">取消</el-button> -->
-                            <van-button type="danger" @click="cancelReservation(reservation.id)" size="small">取消预订</van-button>
+                            <van-button type="danger" @click="cancelReservation(reservation.id)" size="small">取消预订
+                            </van-button>
                         </div>
                     </van-cell>
                 </van-cell-group>
@@ -236,15 +238,25 @@
                         title: '确认取消预订',
                         message: '确认要取消当前预定吗？',
                     }).then(async () => {
-                        const res = await cancelReservationApi(id)
+                        /* const res = await cancelReservationApi(id)
                         if (res.code == 100) {
                             this.$notify({ type: 'success', message: '取消预订成功' });
                             this.init()
                         } else {
                             this.$notify({ type: 'warning', message: res.msg });
-                        }
-                    }).catch((err) => {
-                        this.$notify({ type: 'warning', message: err });
+                        } */
+                        cancelReservationApi(id).then(res => {
+                            if (res.code == 100) {
+                                this.$notify({ type: 'success', message: '取消成功' });
+                                this.init()
+                            } else {
+                                this.$notify({ type: 'warning', message: res.msg });
+                            }
+                        }).catch(err => {
+                            this.$notify({ type: 'warning', message: err });
+                        })
+                    }).catch(() => {
+                        // 点击取消后的回调函数
                     });
                     /* cancelReservationApi(id).then(res => {
                         if (res.code == 100) {

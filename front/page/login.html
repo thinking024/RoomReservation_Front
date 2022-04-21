@@ -29,7 +29,7 @@
             <el-input placeholder=" 请输入账号" v-model="form.account" maxlength='20' />
             </el-input>
             <div class="divSplit"></div>
-            <el-input type="password" placeholder=" 请输入密码" v-model="form.password" maxlength='20' />
+            <el-input show-password placeholder=" 请输入密码" v-model="form.password" maxlength='20' />
             </el-input>
         </div>
         <div class="divMsg" v-if="msgFlag">账号或密码不正确，请重新输入</div>

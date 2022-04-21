@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0,user-scalable=no,minimal-ui">
+    <title>会议室预订系统</title>
+    <link rel="icon" href="images/favico.ico">
+    <!--不同屏幕尺寸根字体设置-->
+    <script src="./js/base.js"></script>
+    <!--mint-->
+    <link rel="stylesheet" href="plugins/mintUI/style.css">
+    </link>
+    <!--vant-->
+    <!-- <link rel="stylesheet" href="styles/vant.min.css" /> -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@2.12/lib/index.css" />
+    <!-- muse -->
+    <link rel="stylesheet" href="plugins/museUI/muse-ui.css">
+    <!-- 引入样式  -->
+    <link rel="stylesheet" href="styles/index.css" />
+    <!--本页面内容的样式-->
+    <link rel="stylesheet" href="styles/main.css" />
+    <style>
+
+    </style>
+</head>
+
+<body>
+    <div id="main" class="app">
+        <!-- <van-field readonly clickable label="楼宇" :value="value" placeholder="选择楼宇" @click="showPicker" />
+        <van-popup v-model="show" round position="bottom">
+            <van-picker show-toolbar :columns="columns" @cancel="show = false" @confirm="onConfirm" />
+        </van-popup> -->
+        <!-- <select name="building" @change="buildingId = $event.target.value">
+            <option :value="building.value" v-for="building in buildings" >{{building.text}}</option>
+        </select> -->
+        <div>
+            <van-dropdown-menu>
+                <van-dropdown-item v-model="buildingId" :options="buildings" @change="changeBuilding()" />
+            </van-dropdown-menu>
+        </div>
+
+        <div>
+            <van-dropdown-menu>
+                <van-dropdown-item v-model="roomId" :options="rooms" />
+            </van-dropdown-menu>
+        </div>
+
+        <div>
+            <mu-button ref="button1" @click="dateOpen = !dateOpen" full-width>选择日期：{{formattedDate}}</mu-button>
+            <mu-popover cover :open.sync="dateOpen" :trigger="dateTrigger">
+                <!-- <mu-date-picker :date.sync="date" @change="onConfirm"></mu-date-picker> -->
+                <mu-flex justify-content="between" align-items="end" wrap="wrap">
+                    <mu-paper :z-depth="1" class="demo-date-picker">
+                        <mu-date-picker :date.sync="date" @change="onConfirm1"></mu-date-picker>
+                    </mu-paper>
+                </mu-flex>
+            </mu-popover>
+        </div>
+
+
+        <div>
+            <span style="float: left;">
+                <mu-button ref="button2" @click="beginTimeOpen = !beginTimeOpen">起始时间：{{formattedBeginTime}}</mu-button>
+                <mu-popover cover :open.sync="beginTimeOpen" :trigger="beginTimeTrigger">
+                    <mu-flex justify-content="between" align-items="end" wrap="wrap">
+                        <mu-paper :z-depth="1">
+                            <mu-time-picker :time.sync="beginTime" view-type="list" format="24hr" @change="onConfirm2">
+                            </mu-time-picker>
+                        </mu-paper>
+                    </mu-flex>
+                </mu-popover>
+            </span>
+
+            <span style="float: right;">
+                <mu-button ref="button3" @click="endTimeOpen = !endTimeOpen">结束时间：{{formattedEndTime}}</mu-button>
+                <mu-popover cover :open.sync="endTimeOpen" :trigger="endTimeTrigger">
+                    <mu-flex justify-content="between" align-items="end" wrap="wrap">
+                        <mu-paper :z-depth="1">
+                            <mu-time-picker :time.sync="endTime" view-type="list" format="24hr" @change="onConfirm3">
+                            </mu-time-picker>
+                        </mu-paper>
+                    </mu-flex>
+                </mu-popover>
+            </span>
+        </div>
+
+        <div style="clear: both;">
+            <van-button type="primary" @click="queryReservation">确定</van-button>
+        </div>
+
+        <!-- <mu-container>
+            <mu-flex justify-content="between" align-items="end" wrap="wrap">
+                <mu-paper :z-depth="1" class="demo-date-picker">
+                    <mu-date-picker :date.sync="date" @change="onConfirm"></mu-date-picker>
+                </mu-paper>
+            </mu-flex>
+        </mu-container> -->
+    </div>
+    <!-- 开发环境版本，包含了有帮助的命令行警告 -->
+    <script src="../backend/plugins/vue/vue.js"></script>
+    <!-- mint -->
+    <script src="plugins/mintUI/index.js"></script>
+    <!-- vant -->
+    <!-- <script src="./js/vant.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/vant@2.12/lib/vant.min.js"></script>
+
+    <script src="plugins/museUI/muse-ui.js"></script>
+    <!-- 引入axios -->
+    <script src="../backend/plugins/axios/axios.min.js"></script>
+    <script src="./js/request.js"></script>
+    <script src="./js/common.js"></script>
+    <script src="./api/main.js"></script>
+</body>
+<script>
+    var app = new Vue({
+        el: '#main',
+        data() {
+            return {
+                show: false,
+                date: undefined,
+                formattedDate: '',
+                beginTime: undefined,
+                formattedBeginTime: '',
+                endTime: undefined,
+                formattedEndTime: '',
+                buildingId: -1,
+                buildings: [
+                    { text: '请选择楼宇', value: -1 }
+                ],
+                roomId: -1,
+                rooms: [
+                    { text: '请选择房间', value: -1 }
+                ],
+                reservations: [],
+                dateOpen: false,
+                dateTrigger: null,
+                beginTimeOpen: false,
+                beginTimeTrigger: null,
+                endTimeOpen: false,
+                endTimeTrigger: null
+            }
+        },
+        computed: {
+            /* goodsNum() {
+                let num = 0
+                this.cartData.forEach(item => {
+                    num += item.number
+                })
+                if (num < 99) {
+                    return num
+                } else {
+                    return '99+'
+                }
+            },
+            goodsPrice() {
+                let price = 0
+                this.cartData.forEach(item => {
+                    price += (item.number * item.amount)
+                })
+                return price
+            } */
+        },
+        created() {
+        },
+        watch: {
+            'dialogFlavor.show'(flag) {
+                if (flag) {
+                    document.querySelector('.divCart').style.zIndex = 1
+                } else {
+                    document.querySelector('.divCart').style.zIndex = 3000
+                }
+            },
+        },
+        mounted() {
+            this.initData();
+            this.dateTrigger = this.$refs.button1.$el;
+            this.beginTimeTrigger = this.$refs.button2.$el;
+            this.endTimeTrigger = this.$refs.button3.$el;
+        },
+        methods: {
+            async initData() {
+                await queryBuildingsApi().then(res => {
+                    if (res.code == 100) {
+                        this.buildings.push(...res.data)
+                        // this.$notify({ type: 'success', message: '取消成功' });
+                    } else {
+                        this.$notify({ type: 'warning', message: res.msg });
+                    }
+                }).catch(err => {
+                    this.$notify({ type: 'warning', message: err });
+                })
+
+                // this.queryRoomsByBuildingId(6)
+            },
+            async queryRoomsByBuildingId(buildingId) {
+                await queryRoomsApi(buildingId).then(res => {
+                    if (res.code == 100) {
+                        this.rooms.push(...res.data)
+                        // this.$notify({ type: 'success', message: '取消成功' });
+                    } else {
+                        this.$notify({ type: 'warning', message: res.msg });
+                    }
+                }).catch(err => {
+                    this.$notify({ type: 'warning', message: err });
+                })
+            },
+            async queryReservation() {
+                if (this.date == undefined) {
+                    this.$notify({ type: 'warning', message: '请选择日期' });
+                    return;
+                }
+                if (this.buildingId == -1) {
+                    this.$notify({ type: 'warning', message: '请选择楼宇' });
+                    return;
+                }
+
+                const params = {
+                    buildingId: this.buildingId,
+                    date: this.formattedDate,
+                    roomId: (this.roomId != -1) ? this.roomId : undefined,
+                    beginTime: (this.beginTime != undefined) ? this.formattedBeginTime : undefined,
+                    endTime: (this.endTime != undefined) ? this.formattedEndTime : undefined
+                }
+                console.log(params)
+                await queryReservationsApi(params).then(res => {
+                    if (res.code == 100) {
+                        this.reservations = res.data
+                        // this.$notify({ type: 'success', message: '取消成功' });
+                    } else {
+                        this.$notify({ type: 'warning', message: res.msg });
+                    }
+                }).catch(err => {
+                    this.$notify({ type: 'warning', message: err });
+                })
+            },
+            changeBuilding() {
+                console.log(this.buildingId)
+                this.rooms = [{ text: '请选择房间', value: -1 }]
+                if (this.buildingId != -1) {
+                    this.queryRoomsByBuildingId(this.buildingId)
+                }
+            },
+            dateTimeFormat(type, fmt, dateTime) {
+                let ret;
+                var opt;
+                if (type == 'date') {
+                    opt = {
+                        "Y+": dateTime.getFullYear().toString(),        // 年
+                        "m+": (dateTime.getMonth() + 1).toString(),     // 月
+                        "d+": dateTime.getDate().toString(),            // 日
+                    };
+                } else if (type == 'time') {
+                    opt = {
+                        "H+": dateTime.getHours().toString(),        // 时
+                        "m+": dateTime.getMinutes().toString(),     // 分
+                        "s+": '00'      // 秒
+                    };
+                }
+                for (let k in opt) {
+                    ret = new RegExp("(" + k + ")").exec(fmt);
+                    if (ret) {
+                        fmt = fmt.replace(ret[1], (ret[1].length == 1) ? (opt[k]) : (opt[k].padStart(ret[1].length, "0")))
+                    };
+                };
+                return fmt;
+            },
+            formatDate(date) {
+                // todo 日期格式化为yyyy-MM-dd
+                /* var year = date.getFullYear();
+                var month = date.getMonth() + 1;
+                var day = date.getDate();
+                return year + '-' + month + '-' + day; */
+                return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+            },
+            formatTime(time) {
+                // todo 时间格式化为HH:mm
+                /* var hour = time.getHours();
+                var minute = time.getMinutes();
+                return hour + ':' + minute; */
+                return `${time.getHours()}:${time.getMinutes()}:00`;
+            },
+            onConfirm1(date) {
+                this.dateOpen = false;
+                this.formattedDate = this.dateTimeFormat('date', 'YYYY-mm-dd', date);
+            },
+            onConfirm2(time) {
+                this.show = false;
+                this.beginTimeOpen = false;
+                // this.formattedBeginTime = this.formatTime(time);
+                this.formattedBeginTime = this.dateTimeFormat('time', 'HH:mm:ss', time);
+            },
+            onConfirm3(time) {
+                this.show = false;
+                this.endTimeOpen = false;
+                this.formattedEndTime = this.dateTimeFormat('time', 'HH:mm:ss', time);
+            },
+        }
+    })
+</script>
+
+</html>
