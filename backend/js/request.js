@@ -45,9 +45,9 @@
   // 响应拦截器
   service.interceptors.response.use(res => {
     if (res.data.code === 201) {// 返回登录页面
-      console.log('---/front/page/login.html---')
+      console.log('---/backend/page/login.html---')
       localStorage.removeItem('token')
-      window.top.location.href = '/front/page/login.html'
+      window.top.location.href = '/backend/page/login/login.html'
     } else {
       return res.data
     }

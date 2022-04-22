@@ -18,10 +18,15 @@
     <link rel="stylesheet" href="../styles/vant.min.css" />
     <!--本页面内容的样式-->
     <link rel="stylesheet" href="./../styles/order.css" />
+    <style>
+        [v-cloak] {
+            display: none !important;
+        }
+    </style>
 </head>
 
 <body>
-    <div id="order" class="app">
+    <div id="order" class="app" v-cloak>
         <div class="divHead">
             <div class="divTitle">
                 <i class="el-icon-arrow-left" @click="goBack"></i>预定记录

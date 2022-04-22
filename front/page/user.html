@@ -29,7 +29,7 @@
                 <i class="el-icon-arrow-left" @click="goBack"></i>个人中心
             </div>
             <div class="divUser">
-                <img src="./../images/headPage.png" />
+                <img src="./../images/head.png" />
                 <div class="desc">
                     <div class="divName">{{user.name}} <img src="./../images/user.png" /></div>
                     <div class="divPhone">{{user.account}}</div>
@@ -75,12 +75,10 @@
                     <el-button type="danger" @click="cancelReservation()" size="small">取消</el-button>
                 </div>
             </div> -->
-            <div class="divOrders" v-if="reservations.length > 0">
+            <div class="divOrders">
                 <!-- <van-list v-model="loading" :finished="finished" finished-text="暂无更多近期预定记录" @load="init"> -->
-                <!-- todo 无数据时显示暂无的字样 -->
-                <!-- <van-empty image="search" description="描述文字" /> -->
+                <div class="title">&nbsp;&nbsp;&nbsp;近期预定记录</div>
                 <van-cell-group inset>
-                    <div class="title">&nbsp;&nbsp;&nbsp;近期预定记录</div>
                     <van-cell v-for="(reservation,index) in reservations" :key="index" class="item">
                         <div class="timeStatus">
                             <span>预订编号：</span>
@@ -106,6 +104,7 @@
                         </div>
                     </van-cell>
                 </van-cell-group>
+                <van-empty image="error" description="近期暂无未开始的预订"  v-if="reservations.length == 0" />
                 <!-- </van-list> -->
             </div>
 
@@ -270,10 +269,11 @@
                     }) */
                 },
                 async toPageLogin() {
-                    const res = await loginoutApi()
+                    const res = await logoutApi()
                     if (res.code == 100) {
                         window.requestAnimationFrame(() => {
                             window.location.href = '/front/page/login.html'
+                            localStorage.removeItem("token")
                         })
                     } else {
                         this.$notify({ type: 'warning', message: res.msg });
