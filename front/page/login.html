@@ -103,7 +103,7 @@
                     if (res.code == 100) {
                         localStorage.setItem("token", res.data)
                         window.requestAnimationFrame(() => {
-                            window.location.href = '/front/index.html'
+                            window.location.href = '/front/main.html'
                         })
                     } else {
                         this.$notify({ type: 'warning', message: res.msg });

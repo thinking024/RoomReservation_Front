@@ -59,7 +59,7 @@
           <el-input v-model="ruleForm.name" placeholder="请填写房间名称" maxlength="20" />
         </el-form-item>
         <div>
-          <el-form-item label="房间分类:" prop="buildingId">
+          <el-form-item label="所在楼宇:" prop="buildingId">
             <el-select v-model="ruleForm.buildingId" placeholder="请选择房间所属楼宇">
               <el-option v-for="(item,index) in buildingList" :key="index" :label="item.name" :value="item.id" />
             </el-select>

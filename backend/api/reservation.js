@@ -20,6 +20,6 @@ const cancel = (params) => {
   return $axios({
     url: '/reservation/cancel',
     method: 'post',
-    data: { ...params }
+    params: { ids: params }
   })
 }

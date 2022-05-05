@@ -255,13 +255,9 @@
             'cancelButtonText': '取消',
             'type': 'warning'
           }).then(() => {
-            const params = {
-              // status,
-              id
-            }
-            cancel(params).then(res => {
+            cancel(id).then(res => {
               if (res.code == 100) {
-                this.$message.success(status === 3 ? '预订已派送' : '预订已完成')
+                this.$message.success('预订已取消')
                 this.init()
               } else {
                 this.$message.error(res.msg || '操作失败')
