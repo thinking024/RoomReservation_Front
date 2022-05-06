@@ -22,16 +22,18 @@
     <!-- 引入样式  -->
     <link rel="stylesheet" href="styles/index.css" />
     <!--本页面内容的样式-->
-    <!-- <link rel="stylesheet" href="styles/main.css" /> -->
+    <link rel="stylesheet" href="styles/main.css" />
     <link rel="stylesheet" href="styles/user.css" />
     <link rel="stylesheet" href="styles/order.css" />
     <style>
-
+        [v-cloak] {
+            display: none !important;
+        }
     </style>
 </head>
 
 <body>
-    <div id="main" class="app">
+    <div id="main" class="app" v-cloak>
         <!-- <van-field readonly clickable label="楼宇" :value="value" placeholder="选择楼宇" @click="showPicker" />
         <van-popup v-model="show" round position="bottom">
             <van-picker show-toolbar :columns="columns" @cancel="show = false" @confirm="onConfirm" />
@@ -41,65 +43,41 @@
         </select> -->
 
         <div class="divHead">
-            <!-- <img src="./images/user.png" @click="toUserPage" /> -->
             <div class="divTitle">
-                <i></i>选择查询条件
+                <!-- <i class="el-icon-arrow-left" @click="goBack"></i> -->
+                <span>
+                    <van-icon name="https://b.yzcdn.cn/vant/icon-demo-1126.png" size="40" @click="toUserPage" />
+                </span>
+                查询可预订房间
             </div>
         </div>
 
-        <div>
-            <van-dropdown-menu>
-                <van-dropdown-item v-model="buildingId" :options="buildings" @change="changeBuilding()" />
-            </van-dropdown-menu>
-        </div>
+        <div class="divBody">
+            <div>
+                <van-dropdown-menu>
+                    <van-dropdown-item v-model="buildingId" :options="buildings" @change="changeBuilding()" />
+                </van-dropdown-menu>
+            </div>
+            <div>
+                <van-dropdown-menu>
+                    <van-dropdown-item v-model="roomId" :options="rooms" />
+                </van-dropdown-menu>
+            </div>
 
-        <div>
-            <van-dropdown-menu>
-                <van-dropdown-item v-model="roomId" :options="rooms" />
-            </van-dropdown-menu>
-        </div>
-
-        <div>
-            <mu-button ref="button1" @click="dateOpen = !dateOpen" full-width>选择日期：{{formattedDate}}</mu-button>
-            <mu-popover cover :open.sync="dateOpen" :trigger="dateTrigger">
-                <!-- <mu-date-picker :date.sync="date" @change="onConfirm"></mu-date-picker> -->
-                <mu-flex justify-content="between" align-items="end" wrap="wrap">
-                    <mu-paper :z-depth="1" class="demo-date-picker">
-                        <mu-date-picker :date.sync="date" @change="onConfirm1"></mu-date-picker>
-                    </mu-paper>
-                </mu-flex>
-            </mu-popover>
-        </div>
-
-        <div>
-            <mu-button ref="button2" @click="beginTimeOpen = !beginTimeOpen" full-width>起始时间：{{formattedBeginTime}}
-            </mu-button>
-            <mu-popover cover :open.sync="beginTimeOpen" :trigger="beginTimeTrigger">
-                <mu-flex justify-content="between" align-items="end" wrap="wrap">
-                    <mu-paper :z-depth="1">
-                        <mu-time-picker :time.sync="beginTime" view-type="list" format="24hr" @change="onConfirm2">
-                        </mu-time-picker>
-                    </mu-paper>
-                </mu-flex>
-            </mu-popover>
-        </div>
-
-        <div>
-            <mu-button ref="button3" @click="endTimeOpen = !endTimeOpen" full-width>结束时间：{{formattedEndTime}}
-            </mu-button>
-            <mu-popover cover :open.sync="endTimeOpen" :trigger="endTimeTrigger">
-                <mu-flex justify-content="between" align-items="end" wrap="wrap">
-                    <mu-paper :z-depth="1">
-                        <mu-time-picker :time.sync="endTime" view-type="list" format="24hr" @change="onConfirm3">
-                        </mu-time-picker>
-                    </mu-paper>
-                </mu-flex>
-            </mu-popover>
-        </div>
-
-        <!-- <div>
-            <span style="float: left;">
-                <mu-button ref="button2" @click="beginTimeOpen = !beginTimeOpen">起始时间：{{formattedBeginTime}}</mu-button>
+            <div>
+                <mu-button ref="button1" @click="dateOpen = !dateOpen" full-width>选择日期：{{formattedDate}}</mu-button>
+                <mu-popover cover :open.sync="dateOpen" :trigger="dateTrigger">
+                    <!-- <mu-date-picker :date.sync="date" @change="onConfirm"></mu-date-picker> -->
+                    <mu-flex justify-content="between" align-items="end" wrap="wrap">
+                        <mu-paper :z-depth="1" class="demo-date-picker">
+                            <mu-date-picker :date.sync="date" @change="onConfirm1"></mu-date-picker>
+                        </mu-paper>
+                    </mu-flex>
+                </mu-popover>
+            </div>
+            <div>
+                <mu-button ref="button2" @click="beginTimeOpen = !beginTimeOpen" full-width>起始时间：{{formattedBeginTime}}
+                </mu-button>
                 <mu-popover cover :open.sync="beginTimeOpen" :trigger="beginTimeTrigger">
                     <mu-flex justify-content="between" align-items="end" wrap="wrap">
                         <mu-paper :z-depth="1">
@@ -108,10 +86,10 @@
                         </mu-paper>
                     </mu-flex>
                 </mu-popover>
-            </span>
-
-            <span style="float: right;">
-                <mu-button ref="button3" @click="endTimeOpen = !endTimeOpen">结束时间：{{formattedEndTime}}</mu-button>
+            </div>
+            <div>
+                <mu-button ref="button3" @click="endTimeOpen = !endTimeOpen" full-width>结束时间：{{formattedEndTime}}
+                </mu-button>
                 <mu-popover cover :open.sync="endTimeOpen" :trigger="endTimeTrigger">
                     <mu-flex justify-content="between" align-items="end" wrap="wrap">
                         <mu-paper :z-depth="1">
@@ -120,35 +98,37 @@
                         </mu-paper>
                     </mu-flex>
                 </mu-popover>
-            </span>
-        </div> -->
+            </div>
 
-        <div style="clear: both;">
-            <van-button type="primary" @click="queryReservation" width="100px">确定</van-button>
+            <div style="clear: both;">
+                <van-button type="primary" @click="queryReservation" width="100px">确定</van-button>
+            </div>
+
+            <!-- 查询房间结果 -->
+            <van-cell-group inset>
+                <van-cell v-for="(ableRoom,index) in ableRooms" :key="index" class="item">
+                    <div class="timeStatus">
+                        <span>房间：</span>
+                        <span>{{ableRoom.name}}</span>
+                    </div>
+                    <div class="timeStatus">
+                        <span>容纳人数: </span>
+                        <span>{{ableRoom.size}}</span>
+                    </div>
+                    <div class="timeStatus">
+                        <span>备注信息: </span>
+                        <span>{{(ableRoom.info == null || ableRoom.info == '') ? '无' : ableRoom.info}}</span>
+                    </div>
+
+                    <div class="btn">
+                        <!-- <el-button type="danger" @click="cancelReservation()" size="small">取消</el-button> -->
+                        <van-button type="primary" @click="addReservation(ableRoom.id)" size="small">预订
+                        </van-button>
+                    </div>
+                </van-cell>
+            </van-cell-group>
+            <van-empty image="error" description="没有满足条件的房间" v-if="ableRooms.length == 0" />
         </div>
-
-        <van-cell-group inset>
-            <van-cell v-for="(ableRoom,index) in ableRooms" :key="index" class="item">
-                <div class="timeStatus">
-                    <span>房间：</span>
-                    <span>{{ableRoom.name}}</span>
-                </div>
-                <div class="timeStatus">
-                    <span>容纳人数: </span>
-                    <span>{{ableRoom.size}}</span>
-                </div>
-                <div class="timeStatus">
-                    <span>备注信息: </span>
-                    <span>{{(ableRoom.info == null || ableRoom.info == '') ? '无' : ableRoom.info}}</span>
-                </div>
-
-                <div class="btn">
-                    <!-- <el-button type="danger" @click="cancelReservation()" size="small">取消</el-button> -->
-                    <van-button type="primary" @click="addReservation(ableRoom.id)" size="small">预订
-                    </van-button>
-                </div>
-            </van-cell>
-        </van-cell-group>
 
 
         <!-- <mu-container>
@@ -277,13 +257,17 @@
                     this.$notify({ type: 'warning', message: '请选择楼宇' });
                     return;
                 }
+                if (this.formattedBeginTime == '' || this.formattedEndTime == '') {
+                    this.$notify({ type: 'warning', message: '请选择起止时间' });
+                    return;
+                }
 
                 const params = {
                     buildingId: this.buildingId,
                     date: this.formattedDate,
                     roomId: (this.roomId != -1) ? this.roomId : undefined,
                     beginTime: (this.beginTime != undefined && this.beginTime != null && this.formattedBeginTime != '') ? this.formattedBeginTime : undefined,
-                    endTime: (this.endTime != undefined  && this.endTime != null  && this.formattedEndTime != '') ? this.formattedEndTime : undefined
+                    endTime: (this.endTime != undefined && this.endTime != null && this.formattedEndTime != '') ? this.formattedEndTime : undefined
                 }
                 console.log(params)
 
@@ -303,9 +287,30 @@
                     this.$notify({ type: 'warning', message: err });
                 })
             },
+            async addReservation(id) {
+                // todo 在预订时可以自定义手机号
+                const params = {
+                    buildingId: this.buildingId,
+                    date: this.formattedDate,
+                    roomId: id,
+                    beginTime: this.formattedBeginTime,
+                    endTime: this.formattedEndTime
+                }
+                console.log(params)
+                addReservationApi(params).then(res => {
+                    if (res.code == 100) {
+                        this.$notify({ type: 'success', message: '预订成功' });
+                        this.queryReservation();
+                    } else {
+                        this.$notify({ type: 'warning', message: res.msg });
+                    }
+                }).catch(err => {
+                    this.$notify({ type: 'warning', message: err });
+                })
+            },
             changeBuilding() {
                 console.log(this.buildingId)
-                this.rooms = [{ text: '请选择房间', value: -1 }]
+                this.rooms = [{ text: '全部房间', value: -1 }]
                 if (this.buildingId != -1) {
                     this.queryRoomsByBuildingId(this.buildingId)
                 }
@@ -380,25 +385,9 @@
                     }
                 }
             },
-            async addReservation(id) {
-                // todo 在预订时可以自定义手机号
-                // todo 未指定时间怎么办
-                const params = {
-                    buildingId: this.buildingId,
-                    date: this.formattedDate,
-                    roomId: id,
-                    beginTime: this.formattedBeginTime,
-                    endTime: this.formattedEndTime
-                }
-                console.log(params)
-                addReservationApi(params).then(res => {
-                    if (res.code == 100) {
-                        this.$notify({ type: 'success', message: '预订成功' });
-                    } else {
-                        this.$notify({ type: 'warning', message: res.msg });
-                    }
-                }).catch(err => {
-                    this.$notify({ type: 'warning', message: err });
+            toUserPage() {
+                window.requestAnimationFrame(() => {
+                    window.location.href = '/front/page/user.html'
                 })
             },
         }
