@@ -36,10 +36,9 @@
       </div>
 
       <!-- 表格数据 -->
-      <!-- todo 名称宽度缩短，备注宽度增加 -->
       <el-table :data="tableData" stripe class="tableBox" @selection-change="handleSelectionChange">
-        <el-table-column type="selection" width="25"></el-table-column>
-        <el-table-column prop="name" label="名称" />
+        <el-table-column type="selection"></el-table-column>
+        <el-table-column prop="name" label="名称"/>
         </el-table-column>
 
         <!-- <el-table-column prop="image" label="图片" align="center">

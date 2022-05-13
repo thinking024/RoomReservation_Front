@@ -72,7 +72,6 @@
           </el-form-item>
         </div>
 
-        <!-- todo 房间图片功能 -->
         <!-- <div>
           <el-form-item label="房间图片:" prop="region" class="uploadImg">
             <el-upload class="avatar-uploader" action="/common/upload" :show-file-list="false"
@@ -154,7 +153,6 @@
                   if (!value) {
                     callback(new Error('请填写房间最大容纳人数'))
                   } else {
-                    // todo 房间人数为数字
                     if (isNaN(value)) {
                       callback(new Error('房间人数必须为数字'))
                     } else {

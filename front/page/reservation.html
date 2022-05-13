@@ -122,15 +122,6 @@
                     if (res.code == 100) {
                         this.reservations.push(...res.data.records)
                         let records = res.data.records || []
-                        /* if (records && Array.isArray(records)) {
-                            records.forEach(item => {
-                                let number = 0
-                                item.orderDetails.forEach(ele => {
-                                    number += ele.number
-                                })
-                                item.sumNum = number
-                            })
-                        } */
                         this.loading = false;
                         if (this.paging.page >= res.data.pages) {
                             this.finished = true;
@@ -160,46 +151,28 @@
                     return str
                 },
                 async cancelReservation(id) {
-                    cancelReservationApi(id).then(res => {
-                        if (res.code == 100) {
-                            this.$notify({ type: 'success', message: '取消成功' });
-                            // 重置查询数据
-                            /* this.finished = false
-                            this.reservations = []
-                            this.paging = {
-                                page: 1,
-                                pageSize: 5
-                            }
-                            this.initData() */
-                            // 遍历reservations数组，将其中的id与传过来的id相同的项修改
-                            this.reservations.forEach(item => {
-                                if (item.id == id) {
-                                    item.status = 0
-                                }
-                            })
-                        } else {
-                            this.$notify({ type: 'warning', message: res.msg });
-                        }
-                    }).catch(err => {
-                        this.$notify({ type: 'warning', message: err });
-                    })
-                    // todo 提示框确认
-                    /* this.$confirm('确认取消预订, 是否继续?', '确定取消', {
-                        'confirmButtonText': '确定',
-                        'cancelButtonText': '算了',
-                    }).then(() => {
-                        cancelReservationApi({ id: this.reservations[0].id }).then(res => {
+                    this.$dialog.confirm({
+                        title: '确认取消预订',
+                        message: '确认要取消当前预定吗？',
+                    }).then(async () => {
+                        cancelReservationApi(id).then(res => {
                             if (res.code == 100) {
                                 this.$notify({ type: 'success', message: '取消成功' });
+                                // 遍历reservations数组，将当前id的预定取消
+                                this.reservations.forEach(item => {
+                                    if (item.id == id) {
+                                        item.status = 0
+                                    }
+                                })
                             } else {
                                 this.$notify({ type: 'warning', message: res.msg });
                             }
                         }).catch(err => {
-                                this.$notify({ type: 'warning', message: err });
+                            this.$notify({ type: 'warning', message: err });
                         })
-                        // 重新加载数据
-                        // this.init()
-                    }) */
+                    }).catch(() => {
+                        // 点击取消后的回调函数
+                    });
                 },
                 getStatus(status) {
                     let str = ''

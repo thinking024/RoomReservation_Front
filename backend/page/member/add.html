@@ -20,7 +20,8 @@
         <el-form-item label="账号:" prop="account">
           <el-input v-model="ruleForm.account" placeholder="请输入账号" maxlength="20" />
         </el-form-item>
-        <!-- todo 用户密码是否可以显示出来用于修改，或者只能重置 -->
+        <!-- TODO: 用户密码是否可以显示出来用于修改，或者只能重置 -->
+        <!-- 若只能重置密码，则新增用户时，采用账号作为默认密码 -->
         <el-form-item label="密码:" prop="password">
           <el-input v-model="ruleForm.password" placeholder="请输入密码" maxlength="20" />
         </el-form-item>

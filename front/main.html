@@ -58,11 +58,13 @@
                     <van-dropdown-item v-model="buildingId" :options="buildings" @change="changeBuilding()" />
                 </van-dropdown-menu>
             </div>
+            <br>
             <div>
                 <van-dropdown-menu>
                     <van-dropdown-item v-model="roomId" :options="rooms" />
                 </van-dropdown-menu>
             </div>
+            <br>
 
             <div>
                 <mu-button ref="button1" @click="dateOpen = !dateOpen" full-width>选择日期：{{formattedDate}}</mu-button>
@@ -75,6 +77,8 @@
                     </mu-flex>
                 </mu-popover>
             </div>
+            <br>
+
             <div>
                 <mu-button ref="button2" @click="beginTimeOpen = !beginTimeOpen" full-width>起始时间：{{formattedBeginTime}}
                 </mu-button>
@@ -87,6 +91,7 @@
                     </mu-flex>
                 </mu-popover>
             </div>
+            <br>
             <div>
                 <mu-button ref="button3" @click="endTimeOpen = !endTimeOpen" full-width>结束时间：{{formattedEndTime}}
                 </mu-button>
@@ -100,10 +105,15 @@
                 </mu-popover>
             </div>
 
-            <div style="clear: both;">
-                <van-button type="primary" @click="queryReservation" width="100px">确定</van-button>
+            <br>
+            <div>
+                <van-button type="primary" @click="queryReservation" block>确定</van-button>
             </div>
 
+            <!-- TODO: 建筑楼备注信息-->
+            <div>
+                
+            </div>
             <!-- 查询房间结果 -->
             <van-cell-group inset>
                 <van-cell v-for="(ableRoom,index) in ableRooms" :key="index" class="item">
@@ -288,7 +298,6 @@
                 })
             },
             async addReservation(id) {
-                // todo 在预订时可以自定义手机号
                 const params = {
                     buildingId: this.buildingId,
                     date: this.formattedDate,
@@ -339,21 +348,6 @@
                 };
                 return fmt;
             },
-            formatDate(date) {
-                // todo 日期格式化为yyyy-MM-dd
-                /* var year = date.getFullYear();
-                var month = date.getMonth() + 1;
-                var day = date.getDate();
-                return year + '-' + month + '-' + day; */
-                return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
-            },
-            formatTime(time) {
-                // todo 时间格式化为HH:mm
-                /* var hour = time.getHours();
-                var minute = time.getMinutes();
-                return hour + ':' + minute; */
-                return `${time.getHours()}:${time.getMinutes()}:00`;
-            },
             onConfirm1(date) {
                 this.dateOpen = false;
                 this.formattedDate = this.dateTimeFormat('date', 'YYYY-mm-dd', date);
@@ -361,8 +355,6 @@
             onConfirm2(time) {
                 this.beginTimeOpen = false;
                 this.formattedBeginTime = this.dateTimeFormat('time', 'HH:mm:ss', time);
-
-                // todo 起始时间必须小于结束时间
                 if (this.endTime != undefined && this.endTime != null && this.formattedEndTime != '') {
                     console.log(this.formattedBeginTime > this.formattedEndTime)
                     if (this.formattedBeginTime > this.formattedEndTime) {
@@ -375,7 +367,6 @@
             onConfirm3(time) {
                 this.endTimeOpen = false;
                 this.formattedEndTime = this.dateTimeFormat('time', 'HH:mm:ss', time);
-                // todo 结束时间必须要比起始时间晚
                 if (this.beginTime != undefined && this.beginTime != null && this.formattedBeginTime != '') {
                     console.log(this.formattedBeginTime > this.formattedEndTime)
                     if (this.formattedBeginTime > this.formattedEndTime) {
