@@ -163,7 +163,9 @@
             mounted() { },
             methods: {
                 goBack() {
-                    history.go(-1)
+                    window.requestAnimationFrame(() => {
+                        window.location.href = '/front/main.html'
+                    })
                 },
                 toAddressPage() {
                     window.requestAnimationFrame(() => {

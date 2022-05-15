@@ -137,7 +137,7 @@
                     </div>
                 </van-cell>
             </van-cell-group>
-            <van-empty image="error" description="没有满足条件的房间" v-if="ableRooms.length == 0" />
+            <van-empty image="error" description="没有满足条件的房间" v-if="ableRooms.length == 0 && buildingId != -1" />
         </div>
 
 

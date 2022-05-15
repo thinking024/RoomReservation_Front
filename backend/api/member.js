@@ -40,3 +40,11 @@ function queryEmployeeById(id) {
     method: 'get'
   })
 }
+
+const deleteUser = (ids) => {
+  return $axios({
+    url: '/user',
+    method: 'delete',
+    params: { ids }
+  })
+}

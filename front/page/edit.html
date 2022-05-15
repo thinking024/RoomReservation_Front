@@ -90,7 +90,9 @@
             },
             methods: {
                 goBack() {
-                    history.go(-1)
+                    window.requestAnimationFrame(() => {
+                        window.location.href = '/front/page/user.html'
+                    })
                 },
                 async initData() {
                     getSelfInfoApi().then(res => {

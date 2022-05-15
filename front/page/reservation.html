@@ -100,7 +100,10 @@
             mounted() { },
             methods: {
                 goBack() {
-                    const url = document.referrer
+                    window.requestAnimationFrame(() => {
+                        window.location.href = '/front/page/user.html'
+                    })
+                    /* const url = document.referrer
                     //表示是从订单页面跳转过来的
                     if (url.includes('success')) {
                         window.requestAnimationFrame(() => {
@@ -108,7 +111,7 @@
                         })
                     } else {
                         history.go(-1)
-                    }
+                    } */
                 },
                 initData() {
                     this.getList()

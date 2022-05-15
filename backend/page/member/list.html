@@ -52,10 +52,12 @@
             <el-button type="text" size="small" class="blueBug" @click="addMemberHandle(scope.row.id)">
               编辑
             </el-button>
-            <el-button type="text" size="small" class="delBut non" @click="statusHandle(scope.row)">
+            <el-button type="text" size="small" class="blueBug" @click="statusHandle(scope.row)">
               {{ scope.row.status == '1' ? '禁用' : '启用' }}
             </el-button>
-            <!-- TODO: 删除用户 -->
+            <el-button type="text" size="small" class="delBut non" @click="deleteHandle(scope.row.id)">
+              删除
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -129,6 +131,28 @@
               name: '修改用户'
             }, true)
           }
+        },// 删除
+        deleteHandle(id) {
+          /* if (type === '批量' && id === null) {
+            if (this.checkList.length === 0) {
+              return this.$message.error('请选择删除对象')
+            }
+          } */
+          this.$confirm('此操作会将用户的预订记录一并删除, 是否继续?', '确定删除', {
+            'confirmButtonText': '确定',
+            'cancelButtonText': '取消',
+          }).then(() => {
+            deleteUser(id).then(res => {
+              if (res.code == 100) {
+                this.$message.success('删除成功！')
+                this.handleQuery()
+              } else {
+                this.$message.error(res.msg || '操作失败')
+              }
+            }).catch(err => {
+              this.$message.error('请求出错了：' + err)
+            })
+          })
         },
         //状态修改
         statusHandle(row) {

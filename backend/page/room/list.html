@@ -49,7 +49,7 @@
             <span style="margin-right: 10px;">{{ scope.row.status == '0' ? '已禁用' : '正常' }}</span>
           </template>
         </el-table-column>
-        <!-- </el-table-column> -->
+        
         <el-table-column label="操作" width="160" align="center">
           <template slot-scope="scope">
             <el-button type="text" size="small" class="blueBug" @click="addRoom(scope.row.id)">
@@ -144,11 +144,11 @@
               return this.$message.error('请选择删除对象')
             }
           }
-          this.$confirm('确认删除该房间, 是否继续?', '确定删除', {
+          this.$confirm('此操作会将房间的预订记录一并删除, 是否继续?', '确定删除', {
             'confirmButtonText': '确定',
             'cancelButtonText': '取消',
           }).then(() => {
-            deleteDish(type === '批量' ? this.checkList.join(',') : id).then(res => {
+            deleteRoom(type === '批量' ? this.checkList.join(',') : id).then(res => {
               if (res.code == 100) {
                 this.$message.success('删除成功！')
                 this.handleQuery()
