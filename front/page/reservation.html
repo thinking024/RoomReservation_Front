@@ -29,7 +29,7 @@
     <div id="order" class="app" v-cloak>
         <div class="divHead">
             <div class="divTitle">
-                <i class="el-icon-arrow-left" @click="goBack"></i>预定记录
+                <i class="el-icon-arrow-left" @click="goBack"></i>预订记录
             </div>
         </div>
         <div class="divBody" v-if="reservations.length > 0">
@@ -57,13 +57,15 @@
                         <!-- <el-button type="danger" @click="cancelReservation()" size="small">取消</el-button> -->
                         <van-button type="danger" @click="cancelReservation(reservation.id)" size="small">取消预订</van-button>
                     </div>
+
+                    <br>
                 </van-cell>
             </van-list>
         </div>
         <div class="divNoData" v-else>
             <div class="divContainer">
                 <img src="./../images/no_order.png" />
-                <div>暂无预定记录</div>
+                <div>暂无预订记录</div>
             </div>
         </div>
     </div>
@@ -156,12 +158,12 @@
                 async cancelReservation(id) {
                     this.$dialog.confirm({
                         title: '确认取消预订',
-                        message: '确认要取消当前预定吗？',
+                        message: '确认要取消当前预订吗？',
                     }).then(async () => {
                         cancelReservationApi(id).then(res => {
                             if (res.code == 100) {
                                 this.$notify({ type: 'success', message: '取消成功' });
-                                // 遍历reservations数组，将当前id的预定取消
+                                // 遍历reservations数组，将当前id的预订取消
                                 this.reservations.forEach(item => {
                                     if (item.id == id) {
                                         item.status = 0

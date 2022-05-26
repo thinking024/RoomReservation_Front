@@ -47,7 +47,7 @@
                 <div class="divSplit"></div>
                 <div class="item" @click="toReservationPage">
                     <img src="./../images/orders.png" />
-                    <span>预定记录</span>
+                    <span>预订记录</span>
                     <i class="el-icon-arrow-right"></i>
                 </div>
             </div>
@@ -76,8 +76,8 @@
                 </div>
             </div> -->
             <div class="divOrders">
-                <!-- <van-list v-model="loading" :finished="finished" finished-text="暂无更多近期预定记录" @load="init"> -->
-                <div class="title">&nbsp;&nbsp;&nbsp;近期预定记录</div>
+                <!-- <van-list v-model="loading" :finished="finished" finished-text="暂无更多近期预订记录" @load="init"> -->
+                <div class="title">&nbsp;&nbsp;&nbsp;近期预订记录</div>
                 <van-cell-group inset>
                     <van-cell v-for="(reservation,index) in reservations" :key="index" class="item">
                         <div class="timeStatus">
@@ -237,7 +237,7 @@
                 cancelReservation(id) {
                     this.$dialog.confirm({
                         title: '确认取消预订',
-                        message: '确认要取消当前预定吗？',
+                        message: '确认要取消当前预订吗？',
                     }).then(async () => {
                         /* const res = await cancelReservationApi(id)
                         if (res.code == 100) {

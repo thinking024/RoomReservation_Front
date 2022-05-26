@@ -203,7 +203,7 @@
             }
           })
         },
-        
+
 
         // 获取楼宇列表
         getBuildingList() {
@@ -220,18 +220,14 @@
           this.$refs[formName].validate((valid) => {
             if (valid) {
               let params = { ...this.ruleForm }
-              // params.flavors = this.dishFlavors
-              params.status = this.ruleForm ? 1 : 0
               params.buildingId = this.ruleForm.buildingId
-              // params.flavors = this.dishFlavors.map(obj => ({ ...obj, value: JSON.stringify(obj.value) }))
-              // delete params.dishFlavors
-              /* if (!this.imageUrl) {
-                this.$message.error('请上传房间图片')
-                return
-              } */
-              /* if (this.ruleForm.info == '') {
-                params.info = null
-              } */
+              // 遍历buildingList，找到对应的id
+              this.buildingList.forEach(item => {
+                if (item.id == params.buildingId) {
+                  params.status = item.status
+                }
+              })
+
               if (this.actionType == 'add') {
                 delete params.id
                 addRoom(params).then(res => {
