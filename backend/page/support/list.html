@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="../../styles/common.css" />
   <link rel="stylesheet" href="../../styles/page.css" />
   <style>
-    #notice-app .notAdmin::after {
+    #support-app .notAdmin::after {
       border: 0 !important;
 
     }
@@ -19,18 +19,18 @@
 </head>
 
 <body>
-  <div class="dashboard-container" id="notice-app">
+  <div class="dashboard-container" id="support-app">
     <div class="container">
       <div class="tableBar">
         <el-button type="primary" @click="addHandle('add')">
-          + 添加公告
+          + 添加
         </el-button>
       </div>
       <el-table :data="tableData" stripe class="tableBox">
         <el-table-column type="selection" width="25"></el-table-column>
-        <el-table-column label="id" width="160">
+        <el-table-column label="标题" width="160">
           <template slot-scope="scope">
-            {{ scope.row.id === null ? '无' : scope.row.id }}
+            {{ scope.row.title === null ? '无' : scope.row.title }}
           </template>
         </el-table-column>
         <el-table-column label="内容">
@@ -40,6 +40,9 @@
         </el-table-column>
         <el-table-column label="操作" width="160" align="center">
           <template slot-scope="scope">
+            <el-button type="text" @click="goDetail(scope.row)" class="blueBug">
+              查看
+            </el-button>
             <el-button type="text" size="small" class="blueBug" @click="addHandle(scope.row.id)">
               编辑
             </el-button>
@@ -53,6 +56,20 @@
         layout="total, sizes, prev, pager, next, jumper" :total="counts" :current-page.sync="page"
         @size-change="handleSizeChange" @current-change="handleCurrentChange"></el-pagination>
     </div>
+  
+    <!-- 查看弹框部分 -->
+    <el-dialog title="使用帮助" :visible.sync="dialogVisible" width="30%" :before-close="handleClose">
+      <div class="info-box">
+        <div class="item-box">
+          <span class="label">标题：</span>
+          <span class="des">{{ diaForm.title }}</span>
+        </div>
+        <div class="item-box">
+          <span class="label">内容：</span>
+          <span class="des">{{ diaForm.content }}</span>
+        </div>
+      </div>
+    </el-dialog>
   </div>
   <!-- 开发环境版本，包含了有帮助的命令行警告 -->
   <script src="../../plugins/vue/vue.js"></script>
@@ -61,11 +78,11 @@
   <!-- 引入axios -->
   <script src="../../plugins/axios/axios.min.js"></script>
   <script src="../../js/request.js"></script>
-  <script src="../../api/notice.js"></script>
+  <script src="../../api/support.js"></script>
   <!-- <script src="../../js/common.js"></script> -->
   <script>
     var memberApp = new Vue({
-      el: '#notice-app',
+      el: '#support-app',
       data() {
         return {
           input: '',
@@ -75,6 +92,8 @@
           tableData: [],
           id: '',
           status: '',
+          diaForm: {},
+          dialogVisible: false
         }
       },
       computed: {},
@@ -89,7 +108,7 @@
             page: this.page,
             pageSize: this.pageSize
           }
-          await getNoticeList(params).then(res => {
+          await getSupportList(params).then(res => {
             if (String(res.code) === '100') {
               this.tableData = res.data.records || []
               this.counts = res.data.total
@@ -107,14 +126,14 @@
           if (st === 'add') {
             window.parent.menuHandle({
               id: '1',
-              url: '/backend/page/notice/add.html',
-              name: '添加公告'
+              url: '/backend/page/support/add.html',
+              name: '添加'
             }, true)
           } else {
             window.parent.menuHandle({
               id: '1',
-              url: '/backend/page/notice/add.html?id=' + st,
-              name: '修改公告'
+              url: '/backend/page/support/add.html?id=' + st,
+              name: '修改'
             }, true)
           }
         },// 删除
@@ -124,11 +143,11 @@
               return this.$message.error('请选择删除对象')
             }
           } */
-          this.$confirm('是否确定继续?', '确定删除', {
+          this.$confirm(' 是否继续?', '确定删除', {
             'confirmButtonText': '确定',
             'cancelButtonText': '取消',
           }).then(() => {
-            deleteNotice(id).then(res => {
+            deleteSupport(id).then(res => {
               if (res.code == 100) {
                 this.$message.success('删除成功！')
                 this.handleQuery()
@@ -139,6 +158,19 @@
               this.$message.error('请求出错了：' + err)
             })
           })
+        },
+        handleQuery() {
+          this.page = 1;
+          this.init();
+        },
+        // 查看详情
+        goDetail(row) {
+          this.diaForm = {}
+          this.dialogVisible = true
+          this.diaForm = { ...row }
+        },
+        handleClose() {
+          this.dialogVisible = false
         },
         handleSizeChange(val) {
           this.pageSize = val
