@@ -29,24 +29,21 @@
     <div id="order" class="app" v-cloak>
         <div class="divHead">
             <div class="divTitle">
-                <i class="el-icon-arrow-left" @click="goBack"></i>使用帮助
+                <i class="el-icon-arrow-left" @click="goBack"></i>用户反馈
             </div>
         </div>
-        <div v-if="supports.length > 0">
-            <van-cell size="large" v-for="(support,index) in supports" :key="index" class="item" :title="index + 1 + '.' + support.title" :label="support.content">
-                <!-- <div>{{support.title}}</div>
-                <div>
-                    <span>{{support.content}}</span>
-                </div> -->
-            </van-cell>
-            <!-- <van-cell title="单元格" value="内容" size="large" />
-            <van-cell title="单元格" value="内容" size="large" label="描述信息" /> -->
-        </div>
-        <div class="divNoData" v-else>
-            <div class="divContainer">
-                <img src="./../images/no_order.png" />
-                <div>暂无</div>
-            </div>
+        <div>
+            <van-form @submit="onSubmit">
+                <van-cell-group inset>
+                    <van-field v-model="content" rows="4" autosize label="留言" type="textarea" maxlength="200"
+                        placeholder="请输入留言" show-word-limit />
+                </van-cell-group>
+                <div style="margin: 16px;">
+                    <van-button round block type="primary" native-type="submit">
+                        提交
+                    </van-button>
+                </div>
+            </van-form>
         </div>
     </div>
     <!-- 开发环境版本，包含了有帮助的命令行警告 -->
@@ -65,16 +62,14 @@
             data() {
                 return {
                     orderList: [],
-                    supports: [],
+                    content: '',
                     loading: false,
                     finished: false,
                     error: false
                 }
             },
             computed: {},
-            created() {
-                this.initData()
-            },
+            created() { },
             mounted() { },
             methods: {
                 goBack() {
@@ -82,31 +77,17 @@
                         window.location.href = '/front/page/user.html'
                     })
                 },
-                initData() {
-                    this.getList()
-                },
-                async getList() {
-                    const res = await getHelpList()
-                    if (res.code == 100) {
-                        this.supports = res.data
-                    } else {
-                        this.$notify({ type: 'warning', message: res.msg });
-                    }
-                },
-                async cancelReservation(id) {
+                async onSubmit(id) {
                     this.$dialog.confirm({
-                        title: '确认取消预订',
-                        message: '确认要取消当前预订吗？',
+                        title: '确认提交',
+                        message: '确认要提交此反馈吗？',
                     }).then(async () => {
-                        cancelReservationApi(id).then(res => {
+                        const params = {
+                            content: this.content
+                        }
+                        addFeedBackApi(params).then(res => {
                             if (res.code == 100) {
-                                this.$notify({ type: 'success', message: '取消成功' });
-                                // 遍历reservations数组，将当前id的预订取消
-                                this.reservations.forEach(item => {
-                                    if (item.id == id) {
-                                        item.status = 0
-                                    }
-                                })
+                                this.$notify({ type: 'success', message: '反馈成功' });
                             } else {
                                 this.$notify({ type: 'warning', message: res.msg });
                             }

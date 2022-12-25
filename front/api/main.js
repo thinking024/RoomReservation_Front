@@ -28,4 +28,11 @@ const addReservationApi = (params) => {
     })
 }
 
+const queryNoticeApi = () => {
+    return $axios({
+        url: '/notice/list',
+        method: 'get'
+    })
+}
+
 
